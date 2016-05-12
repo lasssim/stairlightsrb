@@ -1,0 +1,51 @@
+#!/usr/bin/env ruby
+
+require ::File.expand_path('../../config/environment',  __FILE__)
+
+class ConsolePrint
+
+  attr_reader :canvas
+  attr_reader :reset_terminal
+
+  def initialize(args={})
+    @canvas          = args.fetch(:canvas)
+    @reset_terminal = false
+  end
+
+  def show
+    reset_terminal
+    canvas.pixels.each do |line|
+      line.each do |pixel|
+        print Paint[' ', pixel, :inverse]
+      end
+      puts
+    end
+  end
+
+  private
+  def reset_terminal
+    if @reset_terminal
+      print "\r" + ("\e[A\e[K"*(canvas.height))
+    else
+      @reset_terminal = true
+    end
+  end
+
+end
+
+canvas = Canvas.new(
+  width:  4,
+  height: 20
+)
+
+
+printer = ConsolePrint.new(canvas: canvas)
+
+printer.show
+
+sleep 1
+
+canvas.fill([255, 0, 0])
+printer.show
+
+100.times { canvas.fill(Paint.random) and printer.show and sleep 0.1 }
