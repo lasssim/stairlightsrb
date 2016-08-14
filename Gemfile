@@ -11,3 +11,4 @@ gem 'awesome_print'
 gem 'paint'
 
 gem "ws2812"
+gem 'pry'
