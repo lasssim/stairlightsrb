@@ -13,4 +13,3 @@ gem 'paint'
 gem "ws2812"
 gem 'pry'
 
-gem 'pi_piper'
