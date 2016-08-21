@@ -12,7 +12,7 @@ ws.open
 ws[0] = Ws2812::Color.new(0xff, 0, 0)
 
 # all other set to green
-ws[(1...n)] = Ws2812::Color.new(0xff, 0xff, 0)
+ws[(1...n)] = Ws2812::Color.new(0, 0xff, 0xff)
 
 # second pixel set to blue, via individual components
 ws.set(1, 0, 0, 0xff)
