@@ -202,7 +202,11 @@ end
 m = WSConnection.new('ws://192.168.11.10/ws/rfc6455')
 filter = EventFilter.new(:value_state, "0e4ceede-02a2-606f-ffff9837378acad5") do |event|
   ap event
-  Stairlights::SingleColor.new([0xff, 0xff, 0]).run
+  if event.value == 1.0
+    Stairlights::SingleColor.new([0xff, 0xff, 0]).run
+  else
+    Stairlights::SingleColor.new([0, 0, 0]).run
+  end
 end
 m.register_filter(filter)
 
