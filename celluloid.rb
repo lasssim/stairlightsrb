@@ -51,6 +51,9 @@ class WSConnection
     @ws_client = Celluloid::WebSocket::Client.new url, Celluloid::Actor.current
     #key = [JSON.parse(msg)["LL"]["value"]].pack("H*")
 
+    user, pass = Netrc.read["loxone"]
+    data = "#{user}:#{pass}" 
+
 		digest = OpenSSL::Digest.new('sha1')
 		hmac = OpenSSL::HMAC.digest(digest, key, data).unpack("H*").first
 

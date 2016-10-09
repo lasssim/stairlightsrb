@@ -38,6 +38,7 @@ GEM
     method_source (0.8.2)
     multi_json (1.12.1)
     multipart-post (2.0.0)
+    netrc (0.11.0)
     nio4r (1.2.1)
     paint (1.0.1)
     pry (0.10.4)
@@ -77,6 +78,7 @@ DEPENDENCIES
   celluloid-websocket-client
   faraday
   faraday_middleware
+  netrc
   paint
   pry
   rspec

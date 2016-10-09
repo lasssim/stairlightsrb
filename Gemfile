@@ -16,3 +16,4 @@ gem 'celluloid', require: "celluloid/current"
 gem 'celluloid-websocket-client'
 gem 'faraday'
 gem 'faraday_middleware'
+gem 'netrc'
