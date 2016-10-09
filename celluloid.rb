@@ -192,7 +192,7 @@ module Stairlights
     end
 
     def colorize
-      ws[(0...n)] = color 
+      ws[(0...number_of_leds)] = color 
     end
 
   end
