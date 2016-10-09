@@ -169,43 +169,97 @@ end
 
 
 module Stairlights
-  class SingleColor 
-    attr_accessor :color
-    attr_reader :number_of_leds, :leds_pin
-    
-    def initialize(color)
-      @color = Ws2812::Color.new(*color)
-      @number_of_leds = 24
-      @leds_pin = 18
-      ws.open
+  module Effects
+    class Base
+      attr_reader :number_of_leds, :leds_pin
+      
+      def initialize
+        @number_of_leds = 24
+        @leds_pin = 18
+        ws.open
+      end
+
+      private
+
+      def ws
+        @ws ||= Ws2812::Basic.new(number_of_leds, leds_pin)
+      end
+
+      def set_pixel(pixel, color)
+        ws[pixel] = Ws2812::Color.new(*color)
+      end
     end
 
-    def run
-      colorize
-      ws.show
+    class SingleColor < Base
+      attr_accessor :color
+      
+      def initialize(color)
+        super
+        @color = Ws2812::Color.new(*color)
+      end
+
+      def run
+        colorize
+        ws.show
+      end
+
+      private
+
+      def colorize
+        ws[(0...number_of_leds)] = color 
+      end
+
     end
 
-    private
 
-    def ws
-      @ws ||= Ws2812::Basic.new(number_of_leds, leds_pin)
+    class SimpleFire < Base
+      attr_accessor :timer
+
+      def initialize(timer)
+        @timer = timer
+      end
+
+      def run
+        r = 255
+        g = r-40;
+        b = 40;
+
+        number_of_leds.times do |led|
+          flicker = rand(150)
+          r1 = r-flicker
+          g1 = g-flicker
+          b1 = b-flicker
+
+          g1=0 if(g1<0) 
+          r1=0 if(r1<0) 
+          b1=0 if(b1<0) 
+
+          
+          set_pixel(led, [r1, g1, b1])
+
+        end
+
+        ws.show
+
+        timer.wait(1)
+
+      end   
     end
-
-    def colorize
-      ws[(0...number_of_leds)] = color 
-    end
-
   end
 
 end
+
+
+
+
 
 m = WSConnection.new('ws://192.168.11.10/ws/rfc6455')
 filter = EventFilter.new(:value_state, "0e4ceede-02a2-606f-ffff9837378acad5") do |event|
   ap event
   if event.value == 1.0
-    Stairlights::SingleColor.new([0xff, 0xff, 0]).run
+    Stairlights::Effects::File.new.run
   else
-    Stairlights::SingleColor.new([0, 0, 0]).run
+    Stairlights::Effects::SingleColor.new([0, 0, 0]).run
   end
 end
 m.register_filter(filter)
