@@ -7,9 +7,12 @@ group :test do
 end
 
 gem 'awesome_print'
-
-gem 'paint'
-
-gem "ws2812"
 gem 'pry'
 
+gem "ws2812"
+gem 'paint'
+
+gem 'celluloid', require: "celluloid/current"
+gem 'celluloid-websocket-client'
+gem 'faraday'
+gem 'faraday_middleware'

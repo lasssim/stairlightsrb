@@ -13,5 +13,5 @@ RUN bundle install --deployment --without test
 
 COPY . /usr/src/app
 
-CMD ["./stairlights.rb"]
+CMD ["./celluloid.rb"]
 
