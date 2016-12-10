@@ -9,7 +9,7 @@ WORKDIR /usr/src/app
 
 COPY Gemfile /usr/src/app/
 COPY Gemfile.lock /usr/src/app/
-COPY .netrc* /root/.netrc
+COPY .netrc /root/.netrc
 RUN bundle install --deployment --without test
 
 COPY . /usr/src/app
