@@ -51,14 +51,17 @@ class WSConnection
     @ws_client = Celluloid::WebSocket::Client.new url, Celluloid::Actor.current
     #key = [JSON.parse(msg)["LL"]["value"]].pack("H*")
 
-    user, pass = Netrc.read["loxone"]
-    data = "#{user}:#{pass}" 
+    @user, @pass = Netrc.read["loxone"]
+    data = "#{@user}:#{@pass}" 
 
 		digest = OpenSSL::Digest.new('sha1')
 		hmac = OpenSSL::HMAC.digest(digest, key, data).unpack("H*").first
 
 		@ws_client.text("authenticate/#{hmac}")
-  
+
+#    body = http.get("/data/LoxAPP3.json").body
+#    binding.pry
+
     @ws_client.text("jdev/sps/enablebinstatusupdate")
 
 		#@ws_client.text("jdev/sys/getkey")
@@ -70,13 +73,32 @@ class WSConnection
   end
 
 	def http
-		conn = Faraday.new(:url => 'http://192.168.11.10') do |faraday|
+		conn ||= Faraday.new(:url => 'http://192.168.11.10') do |faraday|
   		faraday.request  :url_encoded             # form-encode POST params
  			faraday.response :logger                  # log requests to STDOUT
   		faraday.response :json, :content_type => /\bjson$/
+      faraday.basic_auth(@user, @pass)
 			faraday.adapter  Faraday.default_adapter  # make requests with Net::HTTP
 		end
 	end
+
+
+  class Control
+    attr_reader :name, :type, :uuid
+    def initialize(control_hash)
+      @name = control_hash.fetch("name")
+      @type = control_hash.fetch("type")
+      @uuid = control_hash.fetch("uuidAction")
+    end
+  end
+
+  def control(uuid)
+    Control.new(controls[uuid])
+  end
+
+  def controls
+    @controls ||= http.get("/data/LoxAPP3.json").body["controls"]
+  end
 
 	def env
 		{	
@@ -109,11 +131,22 @@ class WSConnection
     if msg.is_a? Array
 
       puts "UUID: #{uuid(msg)}"
-      puts "DATA: #{decodefloat64(data(msg))}"
+      begin
+        puts "Name: #{control(uuid(msg)).name}"
+      rescue
+      end
+      puts "DATA: #{decodefloat64(data_value_state(msg))}"
     end
 
-    event = Event.new(:value_state, uuid(msg), decodefloat64(data(msg)))
+    event = Event.new(:value_state, uuid(msg), decodefloat64(data_value_state(msg)))
     filters.each { |f| f.run(event) }
+  end
+
+  def text_state(msg)
+    if msg.is_a? Array
+      puts "UUID: #{uuid(msg)}"
+      puts "DATA: #{data_text_state(msg)}"
+    end
   end
 
   # When WebSocket is closed
@@ -126,8 +159,12 @@ class WSConnection
     [decode32(x[0..3].join), decode16(x[4..5].join), decode16(x[6..7].join), x[8..15].join].join("-")
   end
 
-  def data(msg)
+  def data_value_state(msg)
     msg.map { |e| "%02x" % e }[16..-1].to_a.join
+  end
+
+  def data_text_state(msg)
+    msg[36..-1].pack("U*")
   end
 
   def decode32(str)
@@ -176,11 +213,15 @@ module Stairlights
       def initialize
         @number_of_leds = 24
         @leds_pin = 18
+
+        # right strip -> pin 18 -> 109 leds
+        # left strip  -> pin 17 ->  98 leds
         ws.open
       end
 
       private
 
+      
       def ws
         @ws ||= Ws2812::Basic.new(number_of_leds, leds_pin)
       end
@@ -254,10 +295,10 @@ end
 
 
 m = WSConnection.new('ws://192.168.11.10/ws/rfc6455')
-filter = EventFilter.new(:value_state, "0e4ceede-02a2-606f-ffff9837378acad5") do |event|
+filter = EventFilter.new(:value_state, "0d2956bb-02a8-1e74-ffffda868d47d75b") do |event|
   ap event
-  if event.value == 1.0
-    Stairlights::Effects::File.new.run
+  if event.value > 1.0
+    Stairlights::Effects::SimpleFire.new.run
   else
     Stairlights::Effects::SingleColor.new([0, 0, 0]).run
   end
