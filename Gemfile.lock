@@ -68,7 +68,6 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.5.0)
     rspec-support (3.5.0)
-    rubysdl (2.2.0)
     slop (3.6.0)
     spoon (0.0.6)
       ffi
@@ -98,7 +97,6 @@ DEPENDENCIES
   paint
   pry
   rspec
-  rubysdl
   turnip
   ws2812
 
