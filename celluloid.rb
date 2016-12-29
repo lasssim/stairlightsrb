@@ -210,9 +210,9 @@ module Stairlights
     class Base
       attr_reader :number_of_leds, :leds_pin
       
-      def initialize
-        @number_of_leds = 24
-        @leds_pin = 18
+      def initialize(number_of_leds, leds_pin)
+        @number_of_leds = number_of_leds
+        @leds_pin = leds_pin
 
         # right strip -> pin 18 -> 109 leds
         # left strip  -> pin 17 ->  98 leds
@@ -234,8 +234,8 @@ module Stairlights
     class SingleColor < Base
       attr_accessor :color
       
-      def initialize(color)
-        super()
+      def initialize(number_of_leds, leds_pin, color)
+        super(number_of_leds, leds_pin)
         @color = Ws2812::Color.new(*color)
       end
 
@@ -293,13 +293,16 @@ end
 
 
 
+Stairlights::Effects::SingleColor.new(109, 18, [0, 0, 0]).run
+Stairlights::Effects::SingleColor.new( 98, 17, [0, 0, 0]).run
 
 m = WSConnection.new('ws://192.168.11.10/ws/rfc6455')
 filter = EventFilter.new(:value_state, "0d2956bb-02a8-1e74-ffffda868d47d75b") do |event|
   if event.value > 1.0
     Stairlights::Effects::SimpleFire.new.run
   else
-    Stairlights::Effects::SingleColor.new([0, 0, 0]).run
+    Stairlights::Effects::SingleColor.new(109, 18, [0, 0, 0]).run
+    Stairlights::Effects::SingleColor.new( 98, 17, [0, 0, 0]).run
   end
 end
 m.register_filter(filter)
