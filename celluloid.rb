@@ -235,7 +235,7 @@ module Stairlights
       attr_accessor :color
       
       def initialize(color)
-        super
+        super()
         @color = Ws2812::Color.new(*color)
       end
 
@@ -296,7 +296,6 @@ end
 
 m = WSConnection.new('ws://192.168.11.10/ws/rfc6455')
 filter = EventFilter.new(:value_state, "0d2956bb-02a8-1e74-ffffda868d47d75b") do |event|
-  ap event
   if event.value > 1.0
     Stairlights::Effects::SimpleFire.new.run
   else
