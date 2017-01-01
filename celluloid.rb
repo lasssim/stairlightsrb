@@ -241,8 +241,10 @@ module Stairlights
       end
 
       def run
+        ws.open
         colorize
         ws.show
+        ws.close
       end
 
       private
@@ -297,16 +299,16 @@ end
 Stairlights::Effects::SingleColor.new(109, 18, [0, 0, 0]).run
 Stairlights::Effects::SingleColor.new( 98, 17, [0, 0, 0]).run
 
-m = WSConnection.new('ws://192.168.11.10/ws/rfc6455')
-filter = EventFilter.new(:value_state, "0d2956bb-02a8-1e74-ffffda868d47d75b") do |event|
-  if event.value > 1.0
-    Stairlights::Effects::SimpleFire.new.run
-  else
-    Stairlights::Effects::SingleColor.new(109, 18, [0, 0, 0]).run
-    Stairlights::Effects::SingleColor.new( 98, 17, [0, 0, 0]).run
-  end
-end
-m.register_filter(filter)
-
-while true; sleep; end
-
+#m = WSConnection.new('ws://192.168.11.10/ws/rfc6455')
+#filter = EventFilter.new(:value_state, "0d2956bb-02a8-1e74-ffffda868d47d75b") do |event|
+#  if event.value > 1.0
+#    Stairlights::Effects::SimpleFire.new.run
+#  else
+#    Stairlights::Effects::SingleColor.new(109, 18, [0, 0, 0]).run
+#    Stairlights::Effects::SingleColor.new( 98, 17, [0, 0, 0]).run
+#  end
+#end
+#m.register_filter(filter)
+#
+#while true; sleep; end
+#
