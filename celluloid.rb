@@ -216,7 +216,6 @@ module Stairlights
 
         # right strip -> pin 18 -> 109 leds
         # left strip  -> pin 17 ->  98 leds
-        ws.open
       end
 
       private
@@ -227,7 +226,9 @@ module Stairlights
       end
 
       def set_pixel(pixel, color)
+        ws.open
         ws[pixel] = Ws2812::Color.new(*color)
+        ws.close
       end
     end
 
