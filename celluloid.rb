@@ -222,13 +222,13 @@ module Stairlights
 
       
       def ws
-        @ws ||= Ws2812::Basic.new(number_of_leds, leds_pin)
+        @ws ||= Ws2812::Basic.new(number_of_leds, leds_pin, 10, channel: leds_pin%2)
       end
 
       def set_pixel(pixel, color)
         ws.open
         ws[pixel] = Ws2812::Color.new(*color)
-        ws.close
+        #ws.close
       end
     end
 
@@ -244,7 +244,8 @@ module Stairlights
         ws.open
         colorize
         ws.show
-        ws.close
+        sleep(0.01)
+        #ws.close
       end
 
       private
@@ -295,9 +296,15 @@ end
 
 
 
+Stairlights::Effects::SingleColor.new( 98, 19, [rand(255), rand(255), rand(255)]).run
+Stairlights::Effects::SingleColor.new(109, 18, [rand(255), rand(255), rand(255)]).run
 
-Stairlights::Effects::SingleColor.new(109, 18, [0, 0, 0]).run
-Stairlights::Effects::SingleColor.new( 98, 17, [0, 0, 0]).run
+
+#Stairlights::Effects::SingleColor.new( 50, ARGV[0].to_i, [ARGV[1].to_i, ARGV[2].to_i, ARGV[3].to_i]).run
+
+#(0..40).each do |i|
+#	puts "#{i} -> #{Stairlights::Effects::SingleColor.new( 98, i, [0, 0, 0]).run rescue "x"}"
+#end
 
 #m = WSConnection.new('ws://192.168.11.10/ws/rfc6455')
 #filter = EventFilter.new(:value_state, "0d2956bb-02a8-1e74-ffffda868d47d75b") do |event|
